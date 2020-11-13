@@ -125,13 +125,26 @@ const token_get = req.query.token;
 const {email, password} = req.body;
 if(token_get || email || password){
     try {
-        const user = await LostPassword.find({email, data: token_get});
+        const user = await LostPassword.findOne({email, data: token_get});
+        console.log(user);
         if(user){
+            console.log(email);
+            console.log(password);
+            console.log(token_get);
             const hash = await bcrypt.hash(password, 15);
-            await Users.findOneAndUpdate({email: email},{password: hash} );
-            await LostPassword.deleteMany({email: email});
-            res.send({status: "OK", message: "PASSWORD UPDATED"});
-            return
+            await Users.findOneAndUpdate({email: email},{password: hash}, {new: true}, (err, doc) => {
+                if (err) {
+                    res.status(403).send({ status: "ERROR", message: "ERROR UPDATING DATA"}) 
+                }
+                if(doc){
+                     LostPassword.deleteMany({email: email});
+                    res.send({status: "OK", message: "PASSWORD UPDATED"});
+                    return
+                } else {
+                    res.status(403).send({ status: "ERROR", message: "DATA NOT FOUND"})           
+                }
+                });
+           
         } else {
             res.status(403).send({ status: "ERROR", message: "USER NOT RESET PASS"})
             return

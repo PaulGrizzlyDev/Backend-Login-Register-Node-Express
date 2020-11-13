@@ -17,7 +17,7 @@ LOGIN USER
 /login
 
 LOST PASSWORD
-Send Mail with securoty token
+Send Mail with security token
 /lost-password
 
 RESET PASSWORD
