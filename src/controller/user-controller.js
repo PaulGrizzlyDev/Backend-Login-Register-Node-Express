@@ -90,12 +90,8 @@ const lostPassword = async(req, res) =>{
       },
     });
   
-
-
     try {
-
         const {email} = req.body;
-        console.log(email);
         const token = cryptoRandomString({length: 30, type: 'base64'});
         const user = await Users.findOne({email});
         if(user){
@@ -118,23 +114,35 @@ const lostPassword = async(req, res) =>{
         }else{
             res.status(401).send({status: "USER_NOT_FOUNT", message: ''});
         }
-
-
-
-
-
-
-
     } catch(error){
-       
             res.status(500).send({ status: "ERROR_MAIL", message: error.message})
-            return
-        
-        
+            return   
     }
-   
-    
 };
+
+const resetPassword = async (req, res)=> {
+const token_get = req.query.token;
+const {email, password} = req.body;
+if(token_get || email || password){
+    try {
+        const user = await LostPassword.find({email, data: token_get});
+        if(user){
+            const hash = await bcrypt.hash(password, 15);
+            await Users.findOneAndUpdate({email: email},{password: hash} );
+            await LostPassword.deleteMany({email: email});
+            res.send({status: "OK", message: "PASSWORD UPDATED"});
+            return
+        } else {
+            res.status(403).send({ status: "ERROR", message: "USER NOT RESET PASS"})
+            return
+        }
+    } catch (error) {
+        res.status(403).send({ status: "ERROR", message: error.message})
+    }
+} else {
+    res.status(403).send({ status: "ERROR", message: "MISSING DATA"})
+}
+}
 const updateUser =  async (req, res) =>{
     try {
 
@@ -152,7 +160,6 @@ const updateUser =  async (req, res) =>{
             res.status(500).send({ status: "DUPLICATED_VALUES", message: error.keyValue})
             return
         }
-        
     }
 };
 
@@ -162,4 +169,5 @@ module.exports = {
     getUser, 
     updateUser,
     login,
-    lostPassword};
+    lostPassword,
+    resetPassword};

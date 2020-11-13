@@ -10,5 +10,7 @@ router.post('/update', isAuth, usersController.updateUser);
 router.post('/delete', isAuth, usersController.deleteUser);
 router.post('/login',usersController.login);
 router.post('/lost-password',usersController.lostPassword);
+router.post('/reset-password',usersController.resetPassword);
+
 
 module.exports = router;

@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const {Schema} = mongoose;
 
-
-
 const lostSchema = new Schema({
 
     email: {type: String, required: true}, 
